@@ -1,0 +1,201 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 240 24% 6%;
+  --foreground: 250 45% 96%;
+  --card: 246 25% 9%;
+  --card-foreground: 250 45% 96%;
+  --popover: 246 25% 9%;
+  --popover-foreground: 250 45% 96%;
+  --primary: 270 92% 68%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 244 18% 15%;
+  --secondary-foreground: 250 45% 96%;
+  --muted: 246 18% 14%;
+  --muted-foreground: 250 14% 70%;
+  --accent: 321 86% 62%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 350 85% 57%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 250 22% 20%;
+  --input: 250 22% 18%;
+  --ring: 274 96% 70%;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 14% 6%, rgba(168, 85, 247, 0.22), transparent 28rem),
+    radial-gradient(circle at 84% 12%, rgba(236, 72, 153, 0.16), transparent 24rem),
+    linear-gradient(145deg, #070712 0%, #0b0714 45%, #060610 100%);
+  color: hsl(var(--foreground));
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
+
+::selection {
+  background: rgba(216, 180, 254, 0.34);
+  color: white;
+}
+
+.glass-panel {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.035));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.26);
+  backdrop-filter: blur(20px);
+}
+
+.synapse-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(168, 85, 247, 0.5) transparent;
+}
+
+.synapse-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.synapse-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(168, 85, 247, 0.48);
+  border-radius: 999px;
+}
+
+.tiptap {
+  min-height: calc(100vh - 260px);
+  outline: none;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.tiptap > * + * {
+  margin-top: 0.9rem;
+}
+
+.tiptap h1,
+.tiptap h2,
+.tiptap h3 {
+  color: white;
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: 0;
+}
+
+.tiptap h1 {
+  margin-top: 2rem;
+  font-size: 2.4rem;
+}
+
+.tiptap h2 {
+  margin-top: 1.8rem;
+  font-size: 1.75rem;
+}
+
+.tiptap h3 {
+  margin-top: 1.4rem;
+  font-size: 1.28rem;
+}
+
+.tiptap p {
+  line-height: 1.78;
+  color: rgba(255, 255, 255, 0.84);
+}
+
+.tiptap ul,
+.tiptap ol {
+  padding-left: 1.5rem;
+}
+
+.tiptap ul {
+  list-style: disc;
+}
+
+.tiptap ol {
+  list-style: decimal;
+}
+
+.tiptap blockquote {
+  border-left: 3px solid rgba(216, 180, 254, 0.85);
+  margin: 1.25rem 0;
+  padding-left: 1rem;
+  color: rgba(255, 255, 255, 0.76);
+}
+
+.tiptap hr {
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.13);
+  margin: 2rem 0;
+}
+
+.tiptap pre {
+  background: rgba(8, 8, 18, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #f4e8ff;
+  overflow-x: auto;
+  padding: 1rem;
+}
+
+.tiptap code {
+  background: rgba(168, 85, 247, 0.16);
+  border-radius: 6px;
+  color: #f5d0fe;
+  padding: 0.15rem 0.32rem;
+}
+
+.tiptap pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+}
+
+.tiptap a {
+  color: #f0abfc;
+  text-decoration: underline;
+  text-decoration-color: rgba(240, 171, 252, 0.42);
+  text-underline-offset: 3px;
+}
+
+.tiptap img {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  margin: 1.5rem 0;
+  max-width: 100%;
+}
+
+.tiptap table {
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  overflow: hidden;
+  table-layout: fixed;
+  width: 100%;
+}
+
+.tiptap td,
+.tiptap th {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  min-width: 1em;
+  padding: 0.65rem 0.75rem;
+  vertical-align: top;
+}
+
+.tiptap th {
+  background: rgba(168, 85, 247, 0.16);
+  color: white;
+  font-weight: 700;
+}
+
+.tiptap mark {
+  border-radius: 4px;
+  box-decoration-break: clone;
+  padding: 0.06rem 0.16rem;
+}

@@ -1,0 +1,15 @@
+.DS_Store
+node_modules
+.next
+out
+dist
+coverage
+.env
+.env*.local
+firebase-debug.log
+firestore-debug.log
+storage-debug.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+tsconfig.tsbuildinfo
