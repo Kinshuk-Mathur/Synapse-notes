@@ -1,11 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Loader2, LockKeyhole, Sparkles } from "lucide-react";
-import { useState, type FormEvent, type ReactNode } from "react";
+import { Chrome, Loader2, LockKeyhole, Sparkles } from "lucide-react";
+import { useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { firebaseEnvKeys } from "@/lib/firebase/client";
+import {
+  firebaseEnvKeys,
+  optionalFirebaseEnvKeys
+} from "@/lib/firebase/client";
 import { AuthProvider, useAuth } from "./auth-context";
 
 export function AuthGate({ children }: { children: ReactNode }) {
@@ -72,6 +74,9 @@ function MissingFirebaseConfig() {
               </code>
             ))}
           </div>
+          <p className="mt-4 text-xs text-muted-foreground">
+            Optional later for image uploads: {optionalFirebaseEnvKeys.join(", ")}
+          </p>
         </div>
       </section>
     </main>
@@ -79,30 +84,18 @@ function MissingFirebaseConfig() {
 }
 
 function AuthForm() {
-  const { signIn, signUp } = useAuth();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const { signInWithGoogle } = useAuth();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  async function handleGoogleSignIn() {
     setError(null);
     setBusy(true);
 
     try {
-      if (mode === "signin") {
-        await signIn(email, password);
-      } else {
-        await signUp(email, password);
-      }
+      await signInWithGoogle();
     } catch (authError) {
-      setError(
-        authError instanceof Error
-          ? authError.message
-          : "Authentication failed."
-      );
+      setError(getFriendlyAuthError(authError));
     } finally {
       setBusy(false);
     }
@@ -130,52 +123,51 @@ function AuthForm() {
           </div>
         </div>
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <Input
-            autoComplete="email"
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder="Email"
-            required
-            type="email"
-            value={email}
-          />
-          <Input
-            autoComplete={
-              mode === "signin" ? "current-password" : "new-password"
-            }
-            minLength={6}
-            onChange={(event) => setPassword(event.target.value)}
-            placeholder="Password"
-            required
-            type="password"
-            value={password}
-          />
+        <div className="space-y-4">
           {error ? (
             <p className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-red-100">
               {error}
             </p>
           ) : null}
-          <Button className="w-full" disabled={busy} type="submit">
-            {busy ? <Loader2 className="size-4 animate-spin" /> : null}
-            {mode === "signin" ? "Sign In" : "Create Account"}
-          </Button>
-        </form>
-
-        <div className="mt-5 flex items-center justify-between text-sm">
-          <span className="text-muted-foreground">
-            {mode === "signin" ? "New to SYNAPSE?" : "Already have an account?"}
-          </span>
-          <button
-            className="font-medium text-fuchsia-200 transition hover:text-white"
-            onClick={() =>
-              setMode((current) => (current === "signin" ? "signup" : "signin"))
-            }
+          <Button
+            className="h-12 w-full"
+            disabled={busy}
+            onClick={handleGoogleSignIn}
             type="button"
           >
-            {mode === "signin" ? "Create account" : "Sign in"}
-          </button>
+            {busy ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Chrome className="size-4" />
+            )}
+            Continue with Google
+          </Button>
+          <p className="text-center text-xs leading-5 text-muted-foreground">
+            Use your student Google account to keep notes synced securely.
+          </p>
         </div>
       </motion.section>
     </main>
   );
+}
+
+function getFriendlyAuthError(authError: unknown) {
+  const code =
+    authError && typeof authError === "object" && "code" in authError
+      ? String(authError.code)
+      : "";
+
+  if (code === "auth/unauthorized-domain") {
+    return "This domain is not allowed in Firebase Authentication. Add your Netlify domain in Firebase authorized domains.";
+  }
+
+  if (code === "auth/popup-closed-by-user") {
+    return "Google sign-in was closed before it finished.";
+  }
+
+  if (authError instanceof Error) {
+    return authError.message;
+  }
+
+  return "Google sign-in failed.";
 }

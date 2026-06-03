@@ -1,9 +1,11 @@
 "use client";
 
 import {
-  createUserWithEmailAndPassword,
+  getRedirectResult,
+  GoogleAuthProvider,
   onAuthStateChanged,
-  signInWithEmailAndPassword,
+  signInWithPopup,
+  signInWithRedirect,
   signOut as firebaseSignOut,
   type User
 } from "firebase/auth";
@@ -22,12 +24,15 @@ interface AuthContextValue {
   user: User | null;
   loading: boolean;
   configured: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({
+  prompt: "select_account"
+});
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -39,26 +44,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    void getRedirectResult(auth).catch((error) => {
+      console.error("Google redirect sign-in failed", error);
+    });
+
     return onAuthStateChanged(auth, (nextUser) => {
       setUser(nextUser);
       setLoading(false);
     });
   }, []);
 
-  const signIn = useCallback(async (email: string, password: string) => {
+  const signInWithGoogle = useCallback(async () => {
     if (!auth) {
       throw new Error("Firebase is not configured.");
     }
 
-    await signInWithEmailAndPassword(auth, email, password);
-  }, []);
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (authError) {
+      const code =
+        authError && typeof authError === "object" && "code" in authError
+          ? String(authError.code)
+          : "";
 
-  const signUp = useCallback(async (email: string, password: string) => {
-    if (!auth) {
-      throw new Error("Firebase is not configured.");
+      if (
+        code === "auth/popup-blocked" ||
+        code === "auth/operation-not-supported-in-this-environment"
+      ) {
+        await signInWithRedirect(auth, googleProvider);
+        return;
+      }
+
+      throw authError;
     }
-
-    await createUserWithEmailAndPassword(auth, email, password);
   }, []);
 
   const signOut = useCallback(async () => {
@@ -74,11 +92,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       loading,
       configured: isFirebaseConfigured,
-      signIn,
-      signUp,
+      signInWithGoogle,
       signOut
     }),
-    [loading, signIn, signOut, signUp, user]
+    [loading, signInWithGoogle, signOut, user]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

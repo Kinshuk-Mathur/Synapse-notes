@@ -12,7 +12,6 @@ import {
   Heading1,
   Heading2,
   Heading3,
-  Image as ImageIcon,
   Italic,
   Link2,
   List,
@@ -34,8 +33,7 @@ import {
   useEffect,
   useMemo,
   useRef,
-  useState,
-  type ChangeEvent
+  useState
 } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -61,7 +59,6 @@ interface NoteEditorProps {
   onRestore: () => void | Promise<void>;
   onPermanentDelete: () => void | Promise<void>;
   onCreateBookmark: (bookmark: CreateBookmarkInput) => Promise<void>;
-  onImageUpload: (file: File) => Promise<string>;
 }
 
 type SaveState = "saved" | "saving" | "error";
@@ -77,7 +74,6 @@ export function NoteEditor({
   note,
   onCreateBookmark,
   onDelete,
-  onImageUpload,
   onPermanentDelete,
   onReadModeChange,
   onRestore,
@@ -96,7 +92,6 @@ export function NoteEditor({
     top: number;
     left: number;
   } | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const lastSavedHash = useRef(getSaveHash(note.title, note.content));
   const readModeRef = useRef(readMode);
   const deletedRef = useRef(note.deleted);
@@ -310,37 +305,10 @@ export function NoteEditor({
         icon: Link2,
         active: editor?.isActive("link"),
         action: () => setLink(editor)
-      },
-      {
-        title: "Image",
-        icon: ImageIcon,
-        active: false,
-        action: () => fileInputRef.current?.click()
       }
     ],
     [editor]
   );
-
-  async function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-
-    if (!file || !editor) {
-      return;
-    }
-
-    setEditorMessage("Uploading image...");
-    try {
-      const url = await onImageUpload(file);
-      editor.chain().focus().setImage({ src: url, alt: file.name }).run();
-      setEditorMessage(null);
-    } catch (uploadError) {
-      setEditorMessage(
-        uploadError instanceof Error ? uploadError.message : "Image upload failed."
-      );
-    } finally {
-      event.target.value = "";
-    }
-  }
 
   function markDirtyTitle(nextTitle: string) {
     setTitle(nextTitle);
@@ -493,13 +461,6 @@ export function NoteEditor({
                 </Button>
               );
             })}
-            <input
-              accept="image/*"
-              className="hidden"
-              onChange={handleImageChange}
-              ref={fileInputRef}
-              type="file"
-            />
           </div>
         </div>
       ) : null}

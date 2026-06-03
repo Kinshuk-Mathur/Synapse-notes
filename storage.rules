@@ -1,0 +1,20 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function ownsUserFolder(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    match /notes/{userId}/images/{imageId} {
+      allow read: if ownsUserFolder(userId);
+      allow write: if ownsUserFolder(userId)
+        && request.resource.size < 10 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+  }
+}

@@ -7,9 +7,12 @@ export const firebaseEnvKeys = [
   "NEXT_PUBLIC_FIREBASE_API_KEY",
   "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN",
   "NEXT_PUBLIC_FIREBASE_PROJECT_ID",
-  "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET",
   "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID",
   "NEXT_PUBLIC_FIREBASE_APP_ID"
+] as const;
+
+export const optionalFirebaseEnvKeys = [
+  "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET"
 ] as const;
 
 const firebaseConfig = {
@@ -21,7 +24,17 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
 
-export const isFirebaseConfigured = Object.values(firebaseConfig).every(Boolean);
+const requiredFirebaseConfig = {
+  apiKey: firebaseConfig.apiKey,
+  authDomain: firebaseConfig.authDomain,
+  projectId: firebaseConfig.projectId,
+  messagingSenderId: firebaseConfig.messagingSenderId,
+  appId: firebaseConfig.appId
+};
+
+export const isFirebaseConfigured = Object.values(requiredFirebaseConfig).every(
+  Boolean
+);
 
 export const firebaseApp: FirebaseApp | null = isFirebaseConfigured
   ? getApps().length

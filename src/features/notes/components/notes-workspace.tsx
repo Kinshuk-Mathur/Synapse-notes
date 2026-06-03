@@ -216,13 +216,6 @@ export function NotesWorkspace() {
                 note={selectedNote}
                 onCreateBookmark={handleCreateBookmark}
                 onDelete={() => actions?.softDeleteNote(selectedNote.id)}
-                onImageUpload={async (file) => {
-                  if (!actions) {
-                    throw new Error("Workspace is not ready.");
-                  }
-
-                  return actions.uploadNoteImage(file);
-                }}
                 onPermanentDelete={() => handlePermanentDelete(selectedNote)}
                 onReadModeChange={setReadMode}
                 onRestore={() => actions?.restoreNote(selectedNote.id)}

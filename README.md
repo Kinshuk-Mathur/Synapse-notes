@@ -9,7 +9,8 @@ A premium, student-focused notes app built as a separate repository from SYNAPSE
 - Tailwind CSS
 - shadcn/ui-style primitives
 - Tiptap Editor
-- Firebase Authentication, Firestore, and Storage
+- Firebase Authentication and Firestore
+- Firebase Storage is optional later for image uploads
 - Framer Motion
 
 ## Local Setup
@@ -42,7 +43,7 @@ users/{userId}/notes/{noteId}
 users/{userId}/notes/{noteId}/bookmarks/{bookmarkId}
 ```
 
-Images are uploaded to:
+Image uploads are currently disabled because Firebase Storage may require a paid project. If enabled later, images should upload to:
 
 ```text
 notes/{userId}/images/{fileId}
